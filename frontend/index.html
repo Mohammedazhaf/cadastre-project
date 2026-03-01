@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>Cadastre Professionnel</title>
+
+<!-- Leaflet CSS: bibliothèque pour afficher des cartes interactives -->
+<link rel="stylesheet"
+href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<style>
+
+/* Style global de la page */
+body{
+    font-family:Arial;
+}
+
+/* Style du conteneur de la carte */
+#map{
+    height:90vh;
+    border-radius:15px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h2 style="text-align:center">
+Cadastre Parcelles
+</h2>
+
+<div id="map"></div>
+
+<script>
+
+/*
+Initialisation de la carte Leaflet
+
+Centre : département de l'Aisne
+Zoom : niveau département
+*/
+const map = L.map('map').setView([49.5,3.5],9);
+
+
+/*
+Ajout du fond de carte OpenStreetMap
+*/
+L.tileLayer(
+'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+).addTo(map);
+
+
+/*
+Layer GeoJSON utilisé pour afficher les parcelles.
+
+Utiliser un seul layer améliore fortement les performances
+au lieu de créer un layer pour chaque parcelle.
+*/
+let parcellesLayer = L.geoJSON(null, {
+
+    /*
+    Style visuel des parcelles
+    */
+    style: {
+        color:"#2c7be5",
+        weight:1,
+        fillOpacity:0.3
+    },
+
+    /*
+    Cette fonction est appelée pour chaque parcelle
+    Elle permet d'ajouter les interactions (hover, click)
+    */
+    onEachFeature: function(feature, layer){
+
+        layer.on({
+
+            /*
+            Effet visuel quand la souris passe sur une parcelle
+            */
+            mouseover: function(e){
+
+                e.target.setStyle({
+                    color:"#ff5500",
+                    weight:2,
+                    fillOpacity:0.6
+                });
+
+            },
+
+            /*
+            Restaure le style normal quand la souris sort
+            */
+            mouseout: function(e){
+
+                parcellesLayer.resetStyle(e.target);
+
+            },
+
+            /*
+            Affiche un popup quand on clique sur une parcelle
+            */
+            click: function(e){
+
+                const props = feature.properties;
+
+                layer.bindPopup(`
+                    <b>ID:</b> ${props.gid}<br>
+                    <b>Surface:</b> ${props.surface.toFixed(2)} m²
+                `).openPopup();
+
+            }
+
+        });
+
+    }
+
+}).addTo(map);
+
+
+
+
+/*
+Fonction principale qui charge les parcelles depuis le backend.
+
+Cette fonction utilise la bounding box actuelle de la carte
+pour charger uniquement les parcelles visibles.
+
+Cela améliore énormément les performances.
+*/
+async function loadParcelles(){
+
+    /*
+    Récupération de la zone visible actuelle
+    */
+    const bounds = map.getBounds();
+
+    /*
+    Conversion des coordonnées en format bbox
+    */
+    const bbox = [
+        bounds.getWest(),
+        bounds.getSouth(),
+        bounds.getEast(),
+        bounds.getNorth()
+    ].join(",");
+
+
+    /*
+    Appel à l'API backend
+    */
+    const res = await fetch(
+        `http://localhost:3000/parcelles?bbox=${bbox}`
+    );
+
+    const data = await res.json();
+
+
+    /*
+    Nettoyage des anciennes parcelles
+    */
+    parcellesLayer.clearLayers();
+
+
+    /*
+    Conversion des données en GeoJSON standard
+    */
+    const geojson = {
+        type:"FeatureCollection",
+        features: data.map(p => ({
+            type:"Feature",
+            geometry: JSON.parse(p.geojson),
+            properties:{
+                gid: p.gid,
+                surface: p.surface
+            }
+        }))
+    };
+
+
+    /*
+    Ajout des nouvelles parcelles sur la carte
+    */
+    parcellesLayer.addData(geojson);
+
+}
+
+
+/*
+Chargement initial des parcelles
+*/
+loadParcelles();
+
+
+/*
+Recharge automatiquement les parcelles
+quand l'utilisateur déplace ou zoom la carte
+*/
+map.on("moveend", loadParcelles);
+
+</script>
+
+</body>
+
+</html>
