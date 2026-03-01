@@ -1,19 +1,9 @@
-# 🗺️ Cadastre Web GIS — Application Interactive
+# 🗺️ Cadastre Web GIS
 
 Application Web SIG permettant la visualisation interactive des **parcelles cadastrales du département de l’Aisne (02, France)**.
 
 Le projet est conçu pour gérer un très grand volume de données (~1 million de parcelles) tout en restant rapide, fluide et optimisé grâce aux requêtes spatiales côté serveur.
 
----
-
-## 🚀 Fonctionnalités
-
-- 🗺️ Carte interactive avec Leaflet.js
-- 📍 Chargement dynamique des parcelles selon la zone visible (Bounding Box)
-- 📐 Affichage des informations (ID et surface)
-- ✨ Mise en évidence au survol
-- ⚡ Index spatial GIST pour de hautes performances
-- 🌍 Compatible Windows, macOS et Linux
 
 ---
 
@@ -93,23 +83,6 @@ Ouvrir le fichier :
 
 ```
 frontend/index.html
-```
-
----
-
-## 🧠 Architecture du Projet
-
-```
-cadastre-project/
-│
-├── backend/
-│   ├── server.js
-│   └── package.json
-│
-├── frontend/
-│   └── index.html
-│
-└── README.md
 ```
 
 ---
