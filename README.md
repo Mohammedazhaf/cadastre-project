@@ -1,87 +1,133 @@
-# Cadastre Web GIS — Application Interactive
+# 🗺️ Cadastre Web GIS — Application Interactive
 
-Bienvenue sur **Cadastre Web GIS**, une application web pour visualiser les parcelles cadastrales du département Aisne (02, France) de manière interactive et fluide.
+Application Web SIG permettant la visualisation interactive des **parcelles cadastrales du département de l’Aisne (02, France)**.
 
-Cette application est conçue pour être **rapide**, **intuitive** et **facile à déployer**, même avec un très grand nombre de parcelles (~1 million).
-
----
-
-## 🌐 Aperçu
-
-- Carte interactive avec Leaflet.js
-- Affichage dynamique des parcelles selon la zone visible
-- Popup avec ID et surface des parcelles
-- Survol pour mise en évidence
-- Chargement optimisé grâce aux filtres spatiaux (Bounding Box)
-- Compatible Windows, Mac et Linux
+Le projet est conçu pour gérer un très grand volume de données (~1 million de parcelles) tout en restant rapide, fluide et optimisé grâce aux requêtes spatiales côté serveur.
 
 ---
 
-## 🛠 Technologies utilisées
+## 🚀 Fonctionnalités
 
-**Backend :**
+- 🗺️ Carte interactive avec Leaflet.js
+- 📍 Chargement dynamique des parcelles selon la zone visible (Bounding Box)
+- 📐 Affichage des informations (ID et surface)
+- ✨ Mise en évidence au survol
+- ⚡ Index spatial GIST pour de hautes performances
+- 🌍 Compatible Windows, macOS et Linux
 
+---
+
+## 🛠️ Technologies utilisées
+
+### Backend
 - Node.js
 - Express.js
 - PostgreSQL
 - PostGIS
 
-**Frontend :**
-
-- HTML / CSS / JavaScript
+### Frontend
+- HTML5
+- CSS3
+- JavaScript
 - Leaflet.js
 - OpenStreetMap
 
-**Fonctionnalités SIG :**
-
+### Optimisations SIG
 - Transformation EPSG:2154 → EPSG:4326
-- Spatial Index (GIST)
+- Index spatial GIST
 - Simplification des géométries
-- Limitation du nombre de résultats pour performance
-
+- Limitation dynamique des résultats
+- Filtrage spatial via Bounding Box
 
 ---
 
-## 🔧 Installation et utilisation
+## 📦 Installation Complète
 
-### 1. Installer PostgreSQL et PostGIS
+### 1️⃣ Installer PostgreSQL et PostGIS
 
-Assurez-vous que PostgreSQL est installé et PostGIS activé :
+Créer la base de données :
 
 ```sql
 CREATE DATABASE cadastre;
 \c cadastre
 CREATE EXTENSION postgis;
-### 2. Importer les données
-Importer le shapefile des parcelles :
+```
 
+---
+
+### 2️⃣ Importer les données cadastrales
+
+Importer le shapefile :
+
+```bash
 shp2pgsql -I -s 2154 parcelle.shp parcelles | psql -U postgres -d cadastre
+```
 
-Créer un index spatial pour optimiser les requêtes :
+Créer un index spatial (si nécessaire) :
 
+```sql
 CREATE INDEX parcelles_geom_idx ON parcelles USING GIST(geom);
+```
 
-### 3. Configurer le backend
-Se placer dans le dossier backend :
+---
 
+### 3️⃣ Lancer le Backend
+
+```bash
 cd backend
 npm install
 node server.js
+```
 
-Le serveur tourne sur :
+Le serveur démarre sur :
 
+```
 http://localhost:3000
+```
 
-### 4. Ouvrir le frontend
-Ouvrir simplement :
+---
 
+### 4️⃣ Ouvrir le Frontend
+
+Ouvrir le fichier :
+
+```
 frontend/index.html
+```
 
-👨‍💻 Auteur
-Projet développé par Mohammed Azhaf — Développeur Full-Stack
+---
 
+## 🧠 Architecture du Projet
 
+```
+cadastre-project/
+│
+├── backend/
+│   ├── server.js
+│   └── package.json
+│
+├── frontend/
+│   └── index.html
+│
+└── README.md
+```
 
+---
 
+## 📈 Performance
 
+Grâce à :
 
+- L’index spatial GIST
+- Les requêtes filtrées par zone visible
+- La transformation des coordonnées directement en base
+- La limitation dynamique du nombre de résultats
+
+L’application reste fluide même avec environ 1 million de parcelles.
+
+---
+
+## 👨‍💻 Auteur
+
+**Mohammed Azhaf**  
+Développeur Full-Stack  
